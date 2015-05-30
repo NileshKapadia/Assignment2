@@ -99,6 +99,23 @@ public class OrderQueueTest {
         }
         assertTrue(didThrow);
    }
+   
+    @Test
+   public void testGetNextWhenOrdersInSystemThenGetNextAvialable() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchaseException {
+    OrderQueue orderQueue=new OrderQueue();
+    Order order=new Order("Somevalues","Othervalue");
+    order.addPurchase(new Purchase("someID",12));
+    orderQueue.add(order);
+    
+    Order order2=new Order("Somevalues","Othervalues");
+    order2.addPurchase(new Purchase("someID",12));
+    orderQueue.add(order2);
+    
+     Order result=orderQueue.next();
+     assertEquals(result, order);
+     assertNull(result.getTimeProcessed());
+    
+   }
     
     
 }
