@@ -33,6 +33,7 @@ import org.junit.Test;
  * @author Nilesh Kapadia
  */
 public class OrderQueueTest {
+    private Object orderQueue;
     
     public OrderQueueTest() {
     }
@@ -116,6 +117,16 @@ public class OrderQueueTest {
      assertNull(result.getTimeProcessed());
     
    }
+   @Test
+   public void testGetNextWhenNoOrdersInSystemThenReturnNull() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchaseException {
+   
+    OrderQueue orderQueue=new OrderQueue();
+     Order result= orderQueue.next();
+     
+       assertNull(result);
+    
+   }
+    
     
     
 }
