@@ -30,7 +30,7 @@ import org.junit.Test;
 
 /**
  *
- * @author Len Payne <len.payne@lambtoncollege.ca>
+ * @author Nilesh Kapadia
  */
 public class OrderQueueTest {
     
@@ -54,7 +54,7 @@ public class OrderQueueTest {
     }
 
     @Test
-    public void testWhenCustomerExistsAndPurchasesExistThenTimeReceivedIsNow() {
+    public void testWhenCustomerExistsAndPurchasesExistThenTimeReceivedIsNow() throws Exception {
         OrderQueue orderQueue = new OrderQueue();
         Order order = new Order("CUST00001", "ABC Cafeteria");
         order.addPurchase(new Purchase("PROD0004", 450));
@@ -65,5 +65,25 @@ public class OrderQueueTest {
         long result = order.getTimeReceived().getTime();
         assertTrue(Math.abs(result - expResult) < 1000);
     }
+    @Test
+     public void testWhenCustomerExistsThenThrowException()
+     {
+         boolean didThrow = false;
+        OrderQueue orderQueue = new OrderQueue();
+        Order order = new Order("", "");
+        order.addPurchase(new Purchase("PROD0004", 450));
+        order.addPurchase(new Purchase("PROD0006", 250));
+        try
+        {
+        orderQueue.add(order);
+        }
+        catch(Exception e)
+        {
+            didThrow = true;
+        }
+         assertTrue(didThrow);
+     
+     }
+    
     
 }
