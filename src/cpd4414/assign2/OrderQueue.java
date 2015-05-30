@@ -23,12 +23,16 @@ import java.util.Queue;
 
 /**
  *
- * @author Len Payne <len.payne@lambtoncollege.ca>
+ * @author Nilesh kapadia
  */
 public class OrderQueue {
     Queue<Order> orderQueue = new ArrayDeque<>();
     
-    public void add(Order order) {
+    public void add(Order order) throws Exception {
+        if(order.getCustomerId().isEmpty() && order.getCustomerName().isEmpty())
+        {
+            throw new Exception();
+        }
         orderQueue.add(order);
         order.setTimeReceived(new Date());
     }
