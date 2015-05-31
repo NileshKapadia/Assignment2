@@ -1,6 +1,5 @@
 /*
  * Copyright 2015 Len Payne <len.payne@lambtoncollege.ca>.
- * Updated 2015 Mark Russell <mark.russell@lambtoncollege.ca>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package cpd4414.assign2;
 
 import cpd4414.assign2.OrderQueue;
 import cpd4414.assign2.Purchase;
 import cpd4414.assign2.Order;
 import java.util.Date;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -33,23 +35,22 @@ import org.junit.Test;
  * @author Nilesh Kapadia
  */
 public class OrderQueueTest {
-    private Object orderQueue;
-    
+
     public OrderQueueTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -57,16 +58,17 @@ public class OrderQueueTest {
     @Test
     public void testWhenCustomerExistsAndPurchasesExistThenTimeReceivedIsNow() throws Exception {
         OrderQueue orderQueue = new OrderQueue();
-        Order order = new Order("CUST00001", "ABC Cafeteria");
-        order.addPurchase(new Purchase(1, 450));
-        order.addPurchase(new Purchase(2, 250));
+        Order order = new Order("CUST00001", "ABC Construction");
+        order.addPurchase(new Purchase(1, 8));
+        order.addPurchase(new Purchase(2, 4));
         orderQueue.add(order);
-        
+
         long expResult = new Date().getTime();
         long result = order.getTimeReceived().getTime();
         assertTrue(Math.abs(result - expResult) < 1000);
     }
-     @Test
+
+    @Test
     public void testWhenNoCustomerExistsThenThrowAnException() throws OrderQueue.NoPurchasesException {
         boolean didThrow = false;
         OrderQueue orderQueue = new OrderQueue();
@@ -81,8 +83,9 @@ public class OrderQueueTest {
 
         assertTrue(didThrow);
     }
-   
-     @Test
+
+    @Test
+    
     public void testWhenNoPurchasesThenThrowAnException() throws OrderQueue.NoCustomerException {
         boolean didThrow = false;
         OrderQueue orderQueue = new OrderQueue();
@@ -99,6 +102,7 @@ public class OrderQueueTest {
     @Test
     public void testGetNextWhenOrdersInSystemThenGetNextAvailable() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchasesException {
         OrderQueue orderQueue = new OrderQueue();
+        
         Order order = new Order("SomeValues", "OtherValues");
         order.addPurchase(new Purchase(1, 8));
         orderQueue.add(order);
@@ -137,25 +141,7 @@ public class OrderQueueTest {
         assertTrue(Math.abs(result - expResult) < 1000);
     }
 
-   @Test
-    public void testProcessWhenTimeReceivedNotSetThenThrowException() {
-        boolean didThrow = false;
-        OrderQueue orderQueue = new OrderQueue();
-        Order order = new Order("SomeValues", "OtherValues");
-        order.addPurchase(new Purchase(1, 8));
-
-        try {
-            orderQueue.process(order);
-        } catch (OrderQueue.NoTimeReceivedException ex) {
-            didThrow = true;
-        }
-
-        assertTrue(didThrow);
-    }
-
-   
     @Test
-   
     public void testProcessWhenTimeReceivedNotSetThenThrowException() {
         boolean didThrow = false;
         OrderQueue orderQueue = new OrderQueue();
@@ -207,7 +193,7 @@ public class OrderQueueTest {
         assertTrue(didThrow);
     }
 
-  @Test
+    @Test
     public void testFulfillWhenTimeProcessedNotSetThenThrowException() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchasesException, OrderQueue.NoTimeReceivedException {
         boolean didThrow = false;
         OrderQueue orderQueue = new OrderQueue();
@@ -224,5 +210,13 @@ public class OrderQueueTest {
         assertTrue(didThrow);
     }
 
-    
+    @Test
+    public void testReportWhenNoOrdersThenReturnEmptyString() {
+        OrderQueue orderQueue = new OrderQueue();
+        String expResult = "";
+        String result = orderQueue.report();
+        assertEquals(expResult, result);
+    }
+
+  
 }
