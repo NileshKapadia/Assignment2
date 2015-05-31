@@ -1,6 +1,5 @@
 /*
  * Copyright 2015 Len Payne <len.payne@lambtoncollege.ca>.
- * Updated 2015 Mark Russell <mark.russell@lambtoncollege.ca>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +13,110 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package cpd4414.assign2;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Queue;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
  *
- * @author Nilesh kapadia
+ * @author Nilesh Kapadia
  */
 public class OrderQueue {
+
     Queue<Order> orderQueue = new ArrayDeque<>();
-    
-    public void add(Order order) throws Exception {
-        if(order.getCustomerId().isEmpty() && order.getCustomerName().isEmpty())
-        {
-            throw new Exception();
+    List<Order> orderList = new ArrayList<>();
+
+    public void add(Order order) throws NoCustomerException, NoPurchasesException {
+        if (order.getCustomerId().isEmpty() && order.getCustomerName().isEmpty()) {
+            throw new NoCustomerException();
         }
-        if(order.getListOfPurchases().isEmpty())
-        {
-            throw new Exception();
+        if (order.getListOfPurchases().isEmpty()) {
+            throw new NoPurchasesException();
         }
         orderQueue.add(order);
         order.setTimeReceived(new Date());
+    }
+
+    public Order next() {
+        return orderQueue.peek();
+    }
+
+    void process(Order next) throws NoTimeReceivedException {
+        if (next.equals(next())) {
+//            boolean isOkay = true;
+//            for (Purchase p : next.getListOfPurchases()) {
+//                if (Inventory.getQuantityForId(p.getProductId()) < p.getQuantity())
+//                    isOkay = false;
+//            }
+//            if (isOkay) {
+            orderList.add(orderQueue.remove());
+            next.setTimeProcessed(new Date());
+//            }
+        } else if (next.getTimeReceived() == null) {
+            throw new NoTimeReceivedException();
+        }
+    }
+
+    void fulfill(Order next) throws NoTimeReceivedException, NoTimeProcessedException {
+        if (next.getTimeReceived() == null) {
+            throw new NoTimeReceivedException();
+        }
+        if (next.getTimeProcessed() == null) {
+            throw new NoTimeProcessedException();
+        }
+        if (orderList.contains(next)) {
+            next.setTimeFulfilled(new Date());
+        }
+    }
+
+    String report() {
+        String output = "";
+        if (!(orderQueue.isEmpty() && orderList.isEmpty())) {
+            JSONObject obj = new JSONObject();
+            JSONArray orders = new JSONArray();
+            for (Order o : orderList) {
+               
+            }
+            for (Order o : orderQueue) {
+               
+            }
+            obj.put("orders", orders);
+            output = obj.toJSONString();
+        }
+        return output;
+    }
+
+    public class NoCustomerException extends Exception {
+
+        public NoCustomerException() {
+            super("No Customer Provided");
+        }
+    }
+
+    public class NoPurchasesException extends Exception {
+
+        public NoPurchasesException() {
+            super("No Purchases Provided");
+        }
+    }
+
+    public class NoTimeReceivedException extends Exception {
+
+        public NoTimeReceivedException() {
+            super("No Time Received on this Order");
+        }
+    }
+
+    public class NoTimeProcessedException extends Exception {
+
+        public NoTimeProcessedException() {
+            super("No Time Processed on this Order");
+        }
     }
 }
