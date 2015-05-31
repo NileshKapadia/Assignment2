@@ -66,85 +66,77 @@ public class OrderQueueTest {
         long result = order.getTimeReceived().getTime();
         assertTrue(Math.abs(result - expResult) < 1000);
     }
-    @Test
-     public void testWhenCustomerExistsThenThrowException() throws OrderQueue.NoPurchaseException
-     {
-         boolean didThrow = false;
+     @Test
+    public void testWhenNoCustomerExistsThenThrowAnException() throws OrderQueue.NoPurchasesException {
+        boolean didThrow = false;
         OrderQueue orderQueue = new OrderQueue();
         Order order = new Order("", "");
-        order.addPurchase(new Purchase(1, 450));
-        order.addPurchase(new Purchase(2, 250));
-        try
-        {
-        orderQueue.add(order);
-        }
-        catch(OrderQueue.NoCustomerException e)
-        {
+        order.addPurchase(new Purchase(1, 8));
+        order.addPurchase(new Purchase(2, 4));
+        try {
+            orderQueue.add(order);
+        } catch (OrderQueue.NoCustomerException ex) {
             didThrow = true;
         }
-         assertTrue(didThrow);
-     
-     }
-      
-    @Test
-   public void testWhenNoPurchaseThenThrowException() throws OrderQueue.NoCustomerException {
-        boolean didThrow=false;
-        OrderQueue orderQueue = new OrderQueue();
-        Order order = new Order("SomeNormal", "order");
-      
-        try {
-        orderQueue.add(order);
-        }
-        catch(OrderQueue.NoPurchaseException ex){
-            didThrow=true;
-        }
+
         assertTrue(didThrow);
-   }
+    }
    
+     @Test
+    public void testWhenNoPurchasesThenThrowAnException() throws OrderQueue.NoCustomerException {
+        boolean didThrow = false;
+        OrderQueue orderQueue = new OrderQueue();
+        Order order = new Order("SomeNormal", "Order");
+        try {
+            orderQueue.add(order);
+        } catch (OrderQueue.NoPurchasesException ex) {
+            didThrow = true;
+        }
+
+        assertTrue(didThrow);
+    }
+
     @Test
-   public void testGetNextWhenOrdersInSystemThenGetNextAvialable() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchaseException {
-    OrderQueue orderQueue=new OrderQueue();
-    Order order=new Order("Somevalues","Othervalue");
-    order.addPurchase(new Purchase(1,12));
-    orderQueue.add(order);
-    
-    Order order2=new Order("Somevalues","Othervalues");
-    order2.addPurchase(new Purchase(2,12));
-    orderQueue.add(order2);
-    
-     Order result=orderQueue.next();
-     assertEquals(result, order);
-     assertNull(result.getTimeProcessed());
-    
-   }
-   @Test
-   public void testGetNextWhenNoOrdersInSystemThenReturnNull() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchaseException {
-   
-    OrderQueue orderQueue=new OrderQueue();
-     Order result= orderQueue.next();
-     
-       assertNull(result);
-    
-   }
-   @Test
-   public void testProcessWhenTimeReceivedIsSetThenSetTimeProcessedToNow() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchaseException, OrderQueue.NoTimeReceivedException{
-    
-    OrderQueue orderQueue=new OrderQueue();
-    Order order=new Order("Somevalues","Othervalue");
-    order.addPurchase(new Purchase(1,12));
-    orderQueue.add(order);
-    
-    Order order2=new Order("Somevalues","Othervalues");
-    order2.addPurchase(new Purchase(1,12));
-    orderQueue.add(order2);
-   
-    Order next=orderQueue.next();
-    orderQueue.process(next);
-    
+    public void testGetNextWhenOrdersInSystemThenGetNextAvailable() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchasesException {
+        OrderQueue orderQueue = new OrderQueue();
+        Order order = new Order("SomeValues", "OtherValues");
+        order.addPurchase(new Purchase(1, 8));
+        orderQueue.add(order);
+        Order order2 = new Order("SomeValues", "OtherValues");
+        order2.addPurchase(new Purchase(2, 4));
+        orderQueue.add(order2);
+
+        Order result = orderQueue.next();
+        assertEquals(result, order);
+        assertNull(result.getTimeProcessed());
+    }
+
+    @Test
+    public void testGetNextWhenNoOrdersInSystemThenReturnNull() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchasesException {
+        OrderQueue orderQueue = new OrderQueue();
+
+        Order result = orderQueue.next();
+        assertNull(result);
+    }
+
+    @Test
+    public void testProcessWhenTimeReceivedIsSetThenSetTimeProcessedToNow() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchasesException, OrderQueue.NoTimeReceivedException {
+        OrderQueue orderQueue = new OrderQueue();
+        Order order = new Order("SomeValues", "OtherValues");
+        order.addPurchase(new Purchase(1, 8));
+        orderQueue.add(order);
+        Order order2 = new Order("SomeValues", "OtherValues");
+        order2.addPurchase(new Purchase(2, 4));
+        orderQueue.add(order2);
+
+        Order next = orderQueue.next();
+        orderQueue.process(next);
+
         long expResult = new Date().getTime();
-        long result = order.getTimeProcessed().getTime();
+        long result = next.getTimeProcessed().getTime();
         assertTrue(Math.abs(result - expResult) < 1000);
-   }
+    }
+
    @Test
     public void testProcessWhenTimeReceivedNotSetThenThrowException() {
         boolean didThrow = false;
@@ -160,7 +152,77 @@ public class OrderQueueTest {
 
         assertTrue(didThrow);
     }
-    
-    
+
+   
+    @Test
+   
+    public void testProcessWhenTimeReceivedNotSetThenThrowException() {
+        boolean didThrow = false;
+        OrderQueue orderQueue = new OrderQueue();
+        Order order = new Order("SomeValues", "OtherValues");
+        order.addPurchase(new Purchase(1, 8));
+
+        try {
+            orderQueue.process(order);
+        } catch (OrderQueue.NoTimeReceivedException ex) {
+            didThrow = true;
+        }
+
+        assertTrue(didThrow);
+    }
+
+    @Test
+    public void testFulfillWhenTimeReceivedIsSetAndTimeProcessedIsSetAndItemsInStockThenSetTimeFulfilledToNow() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchasesException, OrderQueue.NoTimeReceivedException, OrderQueue.NoTimeProcessedException {
+        OrderQueue orderQueue = new OrderQueue();
+        Order order = new Order("SomeValues", "OtherValues");
+        order.addPurchase(new Purchase(1, 8));
+        orderQueue.add(order);
+        Order order2 = new Order("SomeValues", "OtherValues");
+        order2.addPurchase(new Purchase(2, 4));
+        orderQueue.add(order2);
+
+        Order next = orderQueue.next();
+        orderQueue.process(next);
+
+        orderQueue.fulfill(next);
+
+        long expResult = new Date().getTime();
+        long result = next.getTimeFulfilled().getTime();
+        assertTrue(Math.abs(result - expResult) < 1000);
+    }
+
+    @Test
+    public void testFulfillWhenTimeReceivedNotSetThenThrowException() throws OrderQueue.NoTimeProcessedException {
+        boolean didThrow = false;
+        OrderQueue orderQueue = new OrderQueue();
+        Order order = new Order("SomeValues", "OtherValues");
+        order.addPurchase(new Purchase(1, 8));
+
+        try {
+            orderQueue.fulfill(order);
+        } catch (OrderQueue.NoTimeReceivedException ex) {
+            didThrow = true;
+        }
+
+        assertTrue(didThrow);
+    }
+
+  @Test
+    public void testFulfillWhenTimeProcessedNotSetThenThrowException() throws OrderQueue.NoCustomerException, OrderQueue.NoPurchasesException, OrderQueue.NoTimeReceivedException {
+        boolean didThrow = false;
+        OrderQueue orderQueue = new OrderQueue();
+        Order order = new Order("SomeValues", "OtherValues");
+        order.addPurchase(new Purchase(1, 8));
+        orderQueue.add(order);
+
+        try {
+            orderQueue.fulfill(order);
+        } catch (OrderQueue.NoTimeProcessedException ex) {
+            didThrow = true;
+        }
+
+        assertTrue(didThrow);
+    }
+
     
 }
